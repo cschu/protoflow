@@ -4,7 +4,7 @@ nextflow.enable.dsl=2
 
 include { nevermore_main } from "./nevermore/workflows/nevermore"
 
-include { metaT_input; metaG_input } from "./imp/workflows/input"
+include { metaT_input; metaG_input } from "./protoflow/workflows/input"
 
 workflow {
 
