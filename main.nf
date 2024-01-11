@@ -5,6 +5,7 @@ nextflow.enable.dsl=2
 include { nevermore_main } from "./nevermore/workflows/nevermore"
 
 include { metaT_input; metaG_input } from "./protoflow/workflows/input"
+include { salmon_index } from "./protoflow/modules/profilers/salmon"
 
 workflow {
 
@@ -24,7 +25,7 @@ workflow {
 		.map { file ->
 			return tuple(file.getParent().getName(), file)
 		}
-	genes_ch.view()
-
+	
+	salmon_index(genes_ch)
 
 }
