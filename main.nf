@@ -27,8 +27,10 @@ workflow {
 
 	genes_ch.dump(pretty: true, tag: genes_ch)
 
-	metaG_input.out.reads.map { sample, files -> return tuple(sample.id, sample, files) }.dump(pretty: true, tag: metaG_ch)
-	metaT_input.out.reads.map { sample, files -> return tuple(sample.id, sample, files) }.dump(pretty: true, tag: metaT_ch)
+	metaG_ch = metaG_input.out.reads.map { sample, files -> return tuple(sample.id, sample, files) }
+	metaG_ch.dump(pretty: true, tag: metaG_ch)
+	metaT_ch = metaT_input.out.reads.map { sample, files -> return tuple(sample.id, sample, files) }
+	metaT_ch.dump(pretty: true, tag: metaT_ch)
 
 	joined_ch = metaG_input.out.reads.map { sample, files -> return tuple(sample.id, sample, files) }
 		.join(metaT_input.out.reads.map { sample, files -> return tuple(sample.id, sample, files) }, by: 0)
