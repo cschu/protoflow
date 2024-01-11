@@ -23,7 +23,9 @@ workflow {
 
 	genes_ch = Channel.fromPath(params.gene_input_dir + "/**.fna.gz")
 		.map { file ->
-			return tuple(file.getParent().getName(), file)
+			meta = [:]
+			meta.id = file.getParent().getName()
+			return tuple(meta, file)
 		}
 	
 	salmon_index(genes_ch)
