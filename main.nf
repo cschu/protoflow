@@ -34,7 +34,7 @@ workflow {
 
 	joined_ch = metaG_input.out.reads.map { sample, files -> return tuple(sample.id.replaceAll(/\.metaG(\.singles)?$/, ""), sample, files) }
 		.join(metaT_input.out.reads.map { sample, files -> return tuple(sample.id.replaceAll(/\.metaT(\.singles)?$/, ""), sample, files) }, by: 0)
-		.join(genes_ch, by: 0)
+		.join(genes_ch.map  { sample, files -> return tuple(sample.id, sample, files) }, by: 0)
 
 	joined_ch.dump(pretty: true, tag: "joined_ch")
 
