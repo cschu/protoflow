@@ -22,7 +22,7 @@ workflow {
 
 	genes_ch = Channel.fromPath(params.gene_input_dir + "/**.fna.gz")
 		.map { file ->
-			return tuple(file.getParent.name, file)
+			return tuple(file.getParent().getName(), file)
 		}
 	genes_ch.view()
 
