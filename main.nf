@@ -20,4 +20,11 @@ workflow {
 
 	nevermore_main(metaT_ch.concat(metaG_ch))
 
+	genes_ch = Channel.fromPath(params.gene_input_dir + "/**.fna.gz")
+		.map { file ->
+			return tuple(file.getParent.name, file)
+		}
+	genes_ch.view()
+
+
 }
