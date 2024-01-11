@@ -25,18 +25,18 @@ workflow {
 			return tuple(meta, file)
 		}
 
-	joined_ch = metaG_input.out.reads
-		.join(metaT_input.out.reads, by: 0)
+	joined_ch = metaG_input.out.reads.map { sample, files -> return tuple(sample.id, sample, files) }
+		.join(metaT_input.out.reads.map { sample, files -> return tuple(sample.id, sample, files) }, by: 0)
 		.join(genes_ch, by: 0)
 
 	metaT_ch = joined_ch
-		.map { sample, metaG, metaT, genes -> return tuple(sample, metaT) }
+		.map { sample_id, sample, metaG, metaT, genes -> return tuple(sample, metaT) }
 	metaG_ch = joined_ch
-		.map { sample, metaG, metaT, genes -> return tuple(sample, metaG) }
+		.map { sample_id, sample, metaG, metaT, genes -> return tuple(sample, metaG) }
 
 	nevermore_main(metaT_ch.concat(metaG_ch))
 
 	
-	salmon_index(joined_ch.map { sample, metaG, metaT, genes -> return tuple(sample, genes) })
+	salmon_index(joined_ch.map { sample_id, x, metaG, y, metaT, genes -> return tuple(sample, genes) })
 
 }
