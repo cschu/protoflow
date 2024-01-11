@@ -33,7 +33,10 @@ workflow {
 	
 	annotation_ch.dump(pretty: true, tag: "genes_ch")
 	
-	nevermore_main(metaT_input.out.reads.concat(metaG_input.out.reads))
+	nevermore_main(
+		metaT_input.out.reads.concat(metaG_input.out.reads)
+			.map { sample, files -> return tuple(sample.clone(), files) }
+	)
 
 	nevermore_main.out.fastqs.dump(pretty: true, tag: "prep_fastq_ch")
 
