@@ -39,9 +39,9 @@ workflow {
 	joined_ch.dump(pretty: true, tag: "joined_ch")
 
 	metaT_ch = joined_ch
-		.map { sample_id, sample, metaG, metaT, genes -> return tuple(sample, metaT) }
+		.map { sample_id, sample, metaG, metaT, sample, genes -> return tuple(sample, metaT) }
 	metaG_ch = joined_ch
-		.map { sample_id, sample, metaG, metaT, genes -> return tuple(sample, metaG) }
+		.map { sample_id, sample, metaG, metaT, sample, genes -> return tuple(sample, metaG) }
 
 	nevermore_main(metaT_ch.concat(metaG_ch))
 
