@@ -42,7 +42,7 @@ workflow {
 
 	all_samples = nevermore_main.out.fastqs
 		.map { sample, files ->
-			return sample.id.replaceAll(/\.metaG(\.singles)?$/, "")			
+			return sample.id.replaceAll(/\.meta?(\.singles)?$/, "")			
 		}
 		.unique()
 
