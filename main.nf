@@ -25,9 +25,7 @@ workflow {
 
 	annotation_ch = Channel.fromPath(params.gene_input_dir + "/**.f?a.gz")
 		.map { file ->
-			meta = [:]
-			meta.id = file.getParent().getName()
-			return tuple(meta.id, file)
+			return tuple(file.getParent().getName(), file)
 		}
 		.groupTuple(size: 2, sort: true)
 		.map { sample_id, file -> 
@@ -55,6 +53,7 @@ workflow {
 
 	transcriptomes_ch = annotation_ch
 		.combine(all_samples, by: 0)
+		.map { sample_id, sample, files -> return tuple(sample_id, sample, files[1]) }
 
 	transcriptomes_ch.dump(pretty: true, tag: "transcriptomes_ch")
 		// .map { sample_id, sample, files -> }
