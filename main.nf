@@ -7,7 +7,7 @@ include { nevermore_main } from "./nevermore/workflows/nevermore"
 include { metaT_input; metaG_input } from "./protoflow/workflows/input"
 include { salmon_index; salmon_quant } from "./protoflow/modules/profilers/salmon"
 include { miniprot } from "./protoflow/modules/align/miniprot"
-include { makeblastdb } from "./protoflow/modules/align/blast"
+include { makeblastdb; blastp } from "./protoflow/modules/align/blast"
 
 workflow {
 
@@ -76,16 +76,33 @@ workflow {
 
 	salmon_index(transcriptomes_ch)
 
-	salmon_ch = nevermore_main.output.fastqs
+	salmon_quant_ch = nevermore_main.output.fastqs
 		.map { sample, files -> return tuple(sample.id.replaceAll(/\.meta[GT](\.singles)?$/, ""), sample.clone(), [files].flatten()) }
 		.combine(salmon_index.out.index.map { sample, files -> return tuple(sample.id, files) }, by: 0)
 		.map { sample_id, sample, fastqs, index ->
 			return tuple(sample.clone(), fastqs, index)
 		}
 	
-	salmon_ch.dump(pretty: true, tag: "salmon_ch")
+	salmon_quant_ch.dump(pretty: true, tag: "salmon_quant_ch")
 
-	salmon_quant(salmon_ch)
+	salmon_quant(salmon_quant_ch)
+
+
+	blastp_ch = metaP_ch
+		.map { sample_id, sample, files -> return tuple(sample_id, [files])}
+		.join(
+			makeblastdb.out.db.map { sample, db -> return tuple(sample.id, db) },
+			by: 0
+		)
+		.map { sample_id, proteins, db ->
+			def meta = [:]
+			meta.id = sample.id
+			return tuple(meta, proteins, db)
+		}
+
+	blastp_ch.dump(pretty: true, tag: "blastp_ch")
+
+	blastp(blastp_ch)
 
 
 	genomes_ch = assembly_ch
