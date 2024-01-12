@@ -27,7 +27,7 @@ workflow {
 		.map { file ->
 			meta = [:]
 			meta.id = file.getParent().getName()
-			return tuple(meta, file)
+			return tuple(meta.id, meta, file)
 		}
 		.groupTuple(size: 2, sort: true)
 	
@@ -47,6 +47,12 @@ workflow {
 		.unique()
 
 	all_samples.dump(pretty: true, tag: "all_samples")
+
+	transcriptomes_ch = annotation_ch
+		.combine(all_samples, by: 0)
+
+	transcriptomes_ch.dump(pretty: true, tag: "transcriptomes_ch")
+		// .map { sample_id, sample, files -> }
 
 	// genes_ch.dump(pretty: true, tag: "genes_ch")
 
