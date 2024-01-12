@@ -5,7 +5,7 @@ nextflow.enable.dsl=2
 include { nevermore_main } from "./nevermore/workflows/nevermore"
 
 include { metaT_input; metaG_input } from "./protoflow/workflows/input"
-include { salmon_index } from "./protoflow/modules/profilers/salmon"
+include { salmon_index; salmon_quant } from "./protoflow/modules/profilers/salmon"
 
 workflow {
 
@@ -57,9 +57,15 @@ workflow {
 
 	transcriptomes_ch.dump(pretty: true, tag: "transcriptomes_ch")
 	
-	// salmon_index_input_ch = joined_ch.map { sample_id, x, metaG, y, metaT, sample, genes -> return tuple(sample, [genes]) }
-	
 	salmon_index(transcriptomes_ch)
+
+	salmon_ch = nevermore_main.output.fastqs
+		.map { sample, files -> 
+			return tuple(sample.id.replaceAll(/(\.singles)$/, ""), files)			
+		}
+		.groupTuple(by: 0, size: 2, remainder: true)
+	
+	salmon_ch.dump(pretty: true, tag: "salmon_ch")
 
 	// genes_ch.dump(pretty: true, tag: "genes_ch")
 
