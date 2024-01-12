@@ -60,17 +60,24 @@ workflow {
 	salmon_index(transcriptomes_ch)
 
 	salmon_ch = nevermore_main.output.fastqs
-		.map { sample, files -> 
-			return tuple(sample.id.replaceAll(/(\.singles)$/, ""), files)			
-		}
-		.groupTuple(by: 0, size: 2, remainder: true)
-		.map { sample_id, files -> return tuple(sample_id.replaceAll(/\.meta[GT]$/, ""), sample_id, [files].flatten()) }
+		.map { sample, files -> return tuple(sample.id.replaceAll(/\.meta[GT](\.singles)?$/, ""), sample.clone(), [files].flatten()) }
 		.combine(salmon_index.out.index.map { sample, files -> return tuple(sample.id, files) }, by: 0)
-		.map { sample_id, sample_libtype_id, fastqs, index -> 
-			def meta = [:]
-			meta.id = sample_libtype_id
-			return tuple(meta, fastqs, index)
+		.map { sample_id, sample, fastqs, index ->
+			return tuple(sample.clone(), fastqs, index)
 		}
+
+
+		// .map { sample, files -> 
+		// 	return tuple(sample.id.replaceAll(/(\.singles)$/, ""), files)			
+		// }
+		// .groupTuple(by: 0, size: 2, remainder: true)
+		// .map { sample_id, files -> return tuple(sample_id.replaceAll(/\.meta[GT]$/, ""), sample_id, [files].flatten()) }
+		// .combine(salmon_index.out.index.map { sample, files -> return tuple(sample.id, files) }, by: 0)
+		// .map { sample_id, sample_libtype_id, fastqs, index -> 
+		// 	def meta = [:]
+		// 	meta.id = sample_libtype_id
+		// 	return tuple(meta, fastqs, index)
+		// }
 	
 	salmon_ch.dump(pretty: true, tag: "salmon_ch")
 
