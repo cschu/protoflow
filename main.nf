@@ -64,7 +64,7 @@ workflow {
 			return tuple(sample.id.replaceAll(/(\.singles)$/, ""), files)			
 		}
 		.groupTuple(by: 0, size: 2, remainder: true)
-		.map { sample_id, files -> return tuple(sample.replaceAll(/\.meta[GT]$/, ""), sample_id, [files].flatten()) }
+		.map { sample_id, files -> return tuple(sample_id.replaceAll(/\.meta[GT]$/, ""), sample_id, [files].flatten()) }
 		.combine(salmon_index.out.index.map { sample, files -> return tuple(sample.id, files) }, by: 0)
 		.map { sample_id, sample_libtype_id, files -> 
 			def meta = [:]
