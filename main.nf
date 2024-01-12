@@ -64,6 +64,7 @@ workflow {
 			return tuple(sample.id.replaceAll(/(\.singles)$/, ""), files)			
 		}
 		.groupTuple(by: 0, size: 2, remainder: true)
+		.map { sample, files -> return tuple(sample, [files].flatten()) }
 	
 	salmon_ch.dump(pretty: true, tag: "salmon_ch")
 
