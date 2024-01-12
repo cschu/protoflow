@@ -96,7 +96,7 @@ workflow {
 		)
 		.map { sample_id, proteins, db ->
 			def meta = [:]
-			meta.id = sample.id
+			meta.id = sample_id
 			return tuple(meta, proteins, db)
 		}
 
