@@ -22,6 +22,7 @@ workflow {
 			meta.id = file.getParent().getName()
 			return tuple(meta.id, meta, file)
 		}
+	metaP_ch.dump(pretty: true, tag: "metaP_ch")
 
 	annotation_ch = Channel.fromPath(params.annotation_input_dir + "/**.f?a.gz")
 		.map { file ->
