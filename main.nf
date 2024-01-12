@@ -64,14 +64,19 @@ workflow {
 			return tuple(sample.id.replaceAll(/(\.singles)$/, ""), files)			
 		}
 		.groupTuple(by: 0, size: 2, remainder: true)
-		.map { sample, files -> return tuple(sample.replaceAll(/\.meta[GT]$/, ""), sample, [files].flatten()) }
+		.map { sample_id, files -> return tuple(sample.replaceAll(/\.meta[GT]$/, ""), sample_id, [files].flatten()) }
 		.combine(salmon_index.out.index.map { sample, files -> return tuple(sample.id, files) }, by: 0)
-		.map { sample_id, sample, files -> 
-			return tuple(sample.clone(), files)
+		.map { sample_id, sample_libtype_id, files -> 
+			def meta = [:]
+			meta.id = sample_libtype_id
+			return tuple(meta, files)
 		}
 	
 	salmon_ch.dump(pretty: true, tag: "salmon_ch")
 
+
+	Invalid method invocation `call` with arguments: 
+	[17_A_007_S00, 17_A_007_S00.metaG, [/scratch/schudoma/WORK/MICROB_PREDICT_proteomics.1834/5a/29b8455039f7691791aa0c1f00373f/no_host/17_A_007_S00.metaG/17_A_007_S00.metaG_R1.fastq.gz, /scratch/schudoma/WORK/MICROB_PREDICT_proteomics.1834/5a/29b8455039f7691791aa0c1f00373f/no_host/17_A_007_S00.metaG/17_A_007_S00.metaG_R2.fastq.gz, /scratch/schudoma/WORK/MICROB_PREDICT_proteomics.1834/6b/9e189ed60f5b8f7a101d769f8287f1/merged/17_A_007_S00.metaG.singles_R1.fastq.gz], /scratch/schudoma/WORK/MICROB_PREDICT_proteomics.1834/48/acc91e9a9c4e39abc63babe46c3438/salmon/index/17_A_007_S00] (java.util.LinkedList) on _closure12 type
 
 
 	// genes_ch.dump(pretty: true, tag: "genes_ch")
