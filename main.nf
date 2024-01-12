@@ -16,7 +16,7 @@ workflow {
 		Channel.fromPath(params.metaG_input_dir + "/*", type: "dir")
 	)
 
-	metaP_ch = Channel.fromPath(params.metaP_input_dir + "/**.faa*")
+	metaP_ch = Channel.fromPath(params.metaP_input_dir + "/**.faa")
 		.map { file -> 
 			def meta = [:]
 			meta.id = file.getParent().getName()
