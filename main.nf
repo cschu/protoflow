@@ -37,7 +37,7 @@ workflow {
 			return tuple(sample_id, meta, file)
 		}
 
-	annotation_ch.dump(pretty: true, tag: "genes_ch")
+	annotation_ch.dump(pretty: true, tag: "annotation_ch")
 
 	assembly_ch = Channel.fromPath(params.assembly_input_dir + "/**.fna.gz")
 		.map { file -> 

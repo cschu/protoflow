@@ -8,7 +8,9 @@ process makeblastdb {
 	"""
 	mkdir -p blastp/${sample.id}/
 
-	makeblastdb -dbtype ${dbtype} -parse_seqids -in ${sequences} -out blastp/${sample.id}/${sample.id}
+	gzip -dc ${sequences} > db.faa
+
+	makeblastdb -dbtype ${dbtype} -parse_seqids -in db.faa -out blastp/${sample.id}/${sample.id}
 	"""
 
 }
