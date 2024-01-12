@@ -64,6 +64,7 @@ workflow {
 
 	transcriptomes_ch.dump(pretty: true, tag: "transcriptomes_ch")
 
+	salmon_index(transcriptomes_ch)
 
 	salmon_ch = nevermore_main.output.fastqs
 		.map { sample, files -> return tuple(sample.id.replaceAll(/\.meta[GT](\.singles)?$/, ""), sample.clone(), [files].flatten()) }
@@ -74,7 +75,6 @@ workflow {
 	
 	salmon_ch.dump(pretty: true, tag: "salmon_ch")
 
-	salmon_index(transcriptomes_ch)
 	salmon_quant(salmon_ch)
 
 
