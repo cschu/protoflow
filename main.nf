@@ -70,6 +70,7 @@ workflow {
 	proteomes_ch = annotation_ch
 		.combine(all_samples, by: 0)
 		.map { sample_id, sample, files -> return tuple(sample, [files[0]]) }
+	proteomes_ch.dump(pretty: true, tag: "proteomes_ch")
 
 	makeblastdb(proteomes_ch, "prot")
 
