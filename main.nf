@@ -74,7 +74,7 @@ workflow {
 	
 	salmon_ch.dump(pretty: true, tag: "salmon_ch")
 
-
+	salmon_quant(salmon_ch)
 	// Invalid method invocation `call` with arguments: 
 	// [17_A_007_S00, 17_A_007_S00.metaG, 
 	// [/scratch/schudoma/WORK/MICROB_PREDICT_proteomics.1834/5a/29b8455039f7691791aa0c1f00373f/no_host/17_A_007_S00.metaG/17_A_007_S00.metaG_R1.fastq.gz, /scratch/schudoma/WORK/MICROB_PREDICT_proteomics.1834/5a/29b8455039f7691791aa0c1f00373f/no_host/17_A_007_S00.metaG/17_A_007_S00.metaG_R2.fastq.gz, /scratch/schudoma/WORK/MICROB_PREDICT_proteomics.1834/6b/9e189ed60f5b8f7a101d769f8287f1/merged/17_A_007_S00.metaG.singles_R1.fastq.gz], 
