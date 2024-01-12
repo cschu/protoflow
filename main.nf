@@ -6,6 +6,7 @@ include { nevermore_main } from "./nevermore/workflows/nevermore"
 
 include { metaT_input; metaG_input } from "./protoflow/workflows/input"
 include { salmon_index; salmon_quant } from "./protoflow/modules/profilers/salmon"
+include { miniprot } from "./protoflow/modules/align/miniprot"
 
 workflow {
 
@@ -87,9 +88,14 @@ workflow {
 	miniprot_ch = metaP_ch
 		.map { sample_id, sample, files -> return tuple(sample_id, [files])}
 		.join(genomes_ch, by: 0)
+		.map { sample_id, proteins, genome ->
+			def meta = [:]
+			meta.id = sample_id
+			return tuple(meta, proteins, genome)
+		}
 	miniprot_ch.dump(pretty: true, tag: "miniprot_ch")
 
-
+	miniprot(miniprot_ch)
 
 
 }
