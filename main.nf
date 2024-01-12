@@ -40,6 +40,14 @@ workflow {
 
 	nevermore_main.out.fastqs.dump(pretty: true, tag: "prep_fastq_ch")
 
+	all_samples = nevermore_main.out.fastqs
+		.map { sample, files ->
+			return sample.id.replaceAll(/\.metaG(\.singles)?$/, "")			
+		}
+		.unique()
+
+	all_samples.dump(pretty: true, tag: "all_samples")
+
 	// genes_ch.dump(pretty: true, tag: "genes_ch")
 
 	// metaG_ch = metaG_input.out.reads.map { sample, files -> return tuple(sample.id.replaceAll(/\.metaG(\.singles)?$/, ""), sample, files) }
