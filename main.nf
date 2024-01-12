@@ -81,10 +81,11 @@ workflow {
 
 	genomes_ch = assembly_ch
 		.combine(all_samples, by: 0)
-		.map { sample_id, sample, files -> return tuple(sample_id, sample, [files])}
+		.map { sample_id, sample, files -> return tuple(sample_id, [files])}
 	genomes_ch.dump(pretty: true, tag: "genomes_ch")
 	
 	miniprot_ch = metaP_ch
+		.map { sample_id, sample, files -> return tuple(sample_id, [files])}
 		.join(genomes_ch, by: 0)
 	miniprot_ch.dump(pretty: true, tag: "miniprot_ch")
 
