@@ -7,6 +7,7 @@ include { nevermore_main } from "./nevermore/workflows/nevermore"
 include { metaT_input; metaG_input } from "./protoflow/workflows/input"
 include { salmon_index; salmon_quant } from "./protoflow/modules/profilers/salmon"
 include { miniprot } from "./protoflow/modules/align/miniprot"
+include { makeblastdb } from "./protoflow/modules/align/blast"
 
 workflow {
 
@@ -25,11 +26,11 @@ workflow {
 		}
 	metaP_ch.dump(pretty: true, tag: "metaP_ch")
 
-	annotation_ch = Channel.fromPath(params.annotation_input_dir + "/**.f?a.gz")
+	annotation_ch = Channel.fromPath(params.annotation_input_dir + "/**.gz")
 		.map { file ->
 			return tuple(file.getParent().getName(), file)
 		}
-		.groupTuple(size: 2, sort: true)
+		.groupTuple(size: 3, sort: true)
 		.map { sample_id, file -> 
 			def meta = [:]
 			meta.id = sample_id
@@ -65,6 +66,12 @@ workflow {
 		.map { sample_id, sample, files -> return tuple(sample, [files[1]]) }
 
 	transcriptomes_ch.dump(pretty: true, tag: "transcriptomes_ch")
+
+	proteomes_ch = annotation_ch
+		.combine(all_samples, by: 0)
+		.map { sample_id, sample, files -> return tuple(sample, [files[0]]) }
+
+	makeblastdb(proteomes_ch)
 
 	salmon_index(transcriptomes_ch)
 
