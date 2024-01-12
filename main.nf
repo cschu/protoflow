@@ -27,9 +27,14 @@ workflow {
 		.map { file ->
 			meta = [:]
 			meta.id = file.getParent().getName()
-			return tuple(meta.id, meta, file)
+			return tuple(meta.id, file)
 		}
 		.groupTuple(size: 2, sort: true)
+		.map { sample_id, file -> 
+			meta = [:]
+			meta.id = sample_id
+			return tuple(sample_id, meta, file)
+		}
 	
 	annotation_ch.dump(pretty: true, tag: "genes_ch")
 	
