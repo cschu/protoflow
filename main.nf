@@ -71,7 +71,7 @@ workflow {
 		.combine(all_samples, by: 0)
 		.map { sample_id, sample, files -> return tuple(sample, [files[0]]) }
 
-	makeblastdb(proteomes_ch)
+	makeblastdb(proteomes_ch, "prot")
 
 	salmon_index(transcriptomes_ch)
 
