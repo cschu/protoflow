@@ -30,7 +30,7 @@ process blastp {
 	script:
 	"""
 	mkdir -p blast/blastp/${sample.id}/
-	blastp -num_threads ${task.cpus} -db ${db} -query ${proteins} -outfmt 6 > blast/blastp/${sample.id}/${sample.id}.tsv
+	blastp -num_threads ${task.cpus} -db ${sample.id} -query ${proteins} -outfmt 6 > blast/blastp/${sample.id}/${sample.id}.tsv
 	"""
 
 }
