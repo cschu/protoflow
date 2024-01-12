@@ -53,10 +53,13 @@ workflow {
 
 	transcriptomes_ch = annotation_ch
 		.combine(all_samples, by: 0)
-		.map { sample_id, sample, files -> return tuple(sample_id, sample, files[1]) }
+		.map { sample_id, sample, files -> return tuple(sample, [files[1]]) }
 
 	transcriptomes_ch.dump(pretty: true, tag: "transcriptomes_ch")
-		// .map { sample_id, sample, files -> }
+	
+	// salmon_index_input_ch = joined_ch.map { sample_id, x, metaG, y, metaT, sample, genes -> return tuple(sample, [genes]) }
+	
+	salmon_index(transcriptomes_ch)
 
 	// genes_ch.dump(pretty: true, tag: "genes_ch")
 
@@ -77,8 +80,5 @@ workflow {
 	// 	.map { sample_id, sample, metaG, y, metaT, z, genes -> return tuple(sample.clone(), metaG) }
 
 
-	// salmon_index_input_ch = joined_ch.map { sample_id, x, metaG, y, metaT, sample, genes -> return tuple(sample, [genes]) }
-	
-	// salmon_index(salmon_index_input_ch)
 
 }
