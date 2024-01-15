@@ -29,7 +29,7 @@ process blastp {
 
 	script:
 
-	def outfmt = """\"6 'std qlen slen qcovs positive'\""""
+	def outfmt = """'6 stdqlen slen qcovs positive'"""
 
 
 	"""
