@@ -33,7 +33,7 @@ def main():
 	ap.add_argument("--out_prefix", "-o", type=str, default="blastp_filtered")
 	args = ap.parse_args()
 
-	df = pd.read_csv(args.blast_output, sep="\t", columns=HEADER)
+	df = pd.read_csv(args.blast_output, sep="\t", names=HEADER)
 
 	df_hi = df[(df["pident"] > args.pident_cutoff_hi) & df["qcovs"] > args.qcovs_cutoff_hi]
 	df_hi.to_csv(f"{args.out_prefix}.hi_conf.tsv", sep="\t", index=False)
