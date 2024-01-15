@@ -6,8 +6,8 @@ include { nevermore_main } from "./nevermore/workflows/nevermore"
 
 include { metaT_input; metaG_input } from "./protoflow/workflows/input"
 include { salmon_index; salmon_quant } from "./protoflow/modules/profilers/salmon"
-include { miniprot } from "./protoflow/modules/align/miniprot"
-include { makeblastdb; blastp } from "./protoflow/modules/align/blast"
+include { miniprot; intersect_miniprot } from "./protoflow/modules/align/miniprot"
+include { makeblastdb; blastp; filter_blastp } from "./protoflow/modules/align/blast"
 
 workflow {
 
@@ -72,6 +72,10 @@ workflow {
 		.map { sample_id, sample, files -> return tuple(sample, [files[0]]) }
 	proteomes_ch.dump(pretty: true, tag: "proteomes_ch")
 
+	gff_ch = annotation_ch
+		.combine(all_samples, by: 0)
+		.map { sample_id, sample, files -> return tuple(sample_id, sample, [files[2]]) }		
+
 	makeblastdb(proteomes_ch, "prot")
 
 	salmon_index(transcriptomes_ch)
@@ -104,6 +108,8 @@ workflow {
 
 	blastp(blastp_ch)
 
+	filter_blastp(blastp.out.blastp)
+
 
 	genomes_ch = assembly_ch
 		.combine(all_samples, by: 0)
@@ -121,6 +127,15 @@ workflow {
 	miniprot_ch.dump(pretty: true, tag: "miniprot_ch")
 
 	miniprot(miniprot_ch)
+
+	intersect_miniprot(
+		miniprot.out.gff
+			.map { sample, gff -> return tuple(sample.id, sample.clone(), gff) }
+			.join(gff_ch, by: 0)
+			.map { sample_id, sample_x, miniprot_gff, sample_y, annotation_gff -> return tuple(sample_x.clone(), miniprot_gff, annotation_gff) }
+	)
+
+
 
 	// 1235  singularity exec -B /scratch -B /g/ bedtools_latest.sif bedtools intersect -a /g/scb2/bork/data/MAGs/annotations/internal_MICROB-PREDICT/psa_megahit/prodigal/MPHU23965372ST.psa_megahit.prodigal.gff.gz -b work/86/19e7407ece45ab89080ca4c9df73ea/miniprot/17_I_106_R10/17_I_106_R10.gff -wao > test.overlap.txt
  	// 1237  singularity exec -B /scratch -B /g/ bedtools_latest.sif bedtools intersect -b /g/scb2/bork/data/MAGs/annotations/internal_MICROB-PREDICT/psa_megahit/prodigal/MPHU23965372ST.psa_megahit.prodigal.gff.gz -a work/86/19e7407ece45ab89080ca4c9df73ea/miniprot/17_I_106_R10/17_I_106_R10.gff -wao > test.overlap.txt
