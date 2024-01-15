@@ -28,7 +28,7 @@ def main():
 	ap = argparse.ArgumentParser()
 	ap.add_argument("blast_output", type=str)
 	ap.add_argument("--pident_cutoff_hi", type=float, default=97.0)
-	ap.add_argument("--pident_cutoff_hi", type=float, default=33.0)
+	ap.add_argument("--pident_cutoff_lo", type=float, default=33.0)
 	ap.add_argument("--qcovs_cutoff_hi", type=float, default=97)
 	ap.add_argument("--out_prefix", "-o", type=str, default="blastp_filtered")
 	args = ap.parse_args()
