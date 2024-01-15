@@ -28,9 +28,14 @@ process blastp {
 	tuple val(sample), path("blast/blastp/${sample.id}/${sample.id}.tsv"), emit: blastp
 
 	script:
+
+	def outfmt = "\"7 'qaccver saccver pident length mismatch gapopen qstart qend sstart send
+   evalue bitscore qlen slen qcovs qcovhsp'\""
+
+
 	"""
 	mkdir -p blast/blastp/${sample.id}/
-	blastp -num_threads ${task.cpus} -db ${sample.id} -query ${proteins} -outfmt 6 > blast/blastp/${sample.id}/${sample.id}.tsv
+	blastp -num_threads ${task.cpus} -db ${sample.id} -query ${proteins} -outfmt ${outfmt} > blast/blastp/${sample.id}/${sample.id}.tsv
 	"""
 
 }
