@@ -135,7 +135,20 @@ workflow {
 			.map { sample_id, sample_x, miniprot_gff, sample_y, annotation_gff -> return tuple(sample_x.clone(), miniprot_gff, annotation_gff) }
 	)
 
+	salmon_results_ch = salmon_quant.out.quant
+		.map { sample, files ->
+			sample_id = sample.id.replaceAll(/\.meta[GT](\.singles)?$/, "")
+			sample_lib_id = sample.id.replaceAll(/\.singles$/, "")
+			return tuple(sample_id, files)			
+		}
+		.groupTuple(by: 0, sort: true)
+	salmon_results_ch.dump(pretty: true, tag: "salmon_results_ch")
 
+	results_ch = metaP_ch
+		.map { sample_id, sample, files -> return tuple(sample, [files])}
+		.join(intersect_miniprot.out.mp_intersect)
+		.join(blastp.out.blastp)
+	results_ch.dump(pretty: true, tag: "results_ch")
 
 	// 1235  singularity exec -B /scratch -B /g/ bedtools_latest.sif bedtools intersect -a /g/scb2/bork/data/MAGs/annotations/internal_MICROB-PREDICT/psa_megahit/prodigal/MPHU23965372ST.psa_megahit.prodigal.gff.gz -b work/86/19e7407ece45ab89080ca4c9df73ea/miniprot/17_I_106_R10/17_I_106_R10.gff -wao > test.overlap.txt
  	// 1237  singularity exec -B /scratch -B /g/ bedtools_latest.sif bedtools intersect -b /g/scb2/bork/data/MAGs/annotations/internal_MICROB-PREDICT/psa_megahit/prodigal/MPHU23965372ST.psa_megahit.prodigal.gff.gz -a work/86/19e7407ece45ab89080ca4c9df73ea/miniprot/17_I_106_R10/17_I_106_R10.gff -wao > test.overlap.txt
