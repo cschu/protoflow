@@ -141,7 +141,7 @@ workflow {
 			sample_lib_id = sample.id.replaceAll(/\.singles$/, "")
 			return tuple(sample_id, files)			
 		}
-		.groupTuple(by: 0, sort: true)
+		.groupTuple(by: 0)
 	salmon_results_ch.dump(pretty: true, tag: "salmon_results_ch")
 
 	results_ch = metaP_ch
