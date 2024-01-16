@@ -135,7 +135,7 @@ workflow {
 			.map { sample_id, sample_x, miniprot_gff, sample_y, annotation_gff -> return tuple(sample_x.clone(), miniprot_gff, annotation_gff) }
 	)
 
-	salmon_results_ch = salmon_quant.out.quant
+	salmon_results_ch = salmon_quant.out.salmon_counts
 		.map { sample, files ->
 			sample_id = sample.id.replaceAll(/\.meta[GT](\.singles)?$/, "")
 			sample_lib_id = sample.id.replaceAll(/\.singles$/, "")

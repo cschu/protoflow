@@ -27,7 +27,8 @@ process salmon_quant {
 	tuple val(sample), path(fastqs), path(salmon_index)
 
 	output:
-	tuple val(sample), path("salmon/quant/${sample.id}/*"), emit: quant
+	// tuple val(sample), path("salmon/quant/${sample.id}/*"), emit: quant
+	tuple val(sample), path("salmon/quant/${sample.id}/${sample.id}.salmon_quant.tsv"), emit: salmon_counts
 
 	script:
 
@@ -51,6 +52,8 @@ process salmon_quant {
 	mkdir -p salmon/quant/${sample.id}/
 
 	salmon quant -p ${task.cpus} -i ${salmon_index} -l ${params.profilers.salmon.quant.libtype} ${input_files} --validateMappings -o salmon/quant/${sample.id}/
+
+	ln -s salmon/quant/${sample.id}/quant.sf salmon/quant/${sample.id}/${sample.id}.salmon_quant.tsv
 	"""	
 	// ./bin/salmon quant -i transcripts_index -l <LIBTYPE> -1 reads1.fq -2 reads2.fq --validateMappings -o transcripts_quant
 
