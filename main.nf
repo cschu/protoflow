@@ -108,7 +108,7 @@ workflow {
 
 	blastp(blastp_ch)
 
-	filter_blastp(blastp.out.blastp)
+	// filter_blastp(blastp.out.blastp)
 
 
 	genomes_ch = assembly_ch

@@ -31,7 +31,7 @@ process blastp {
 	script:
 
 	// std = 'qaccver saccver pident length mismatch gapopen qstart qend sstart send evalue bitscore'
-	def outfmt = """'6 std qlen slen qcovs positive'"""
+	def outfmt = """'6 std qlen slen qcovs positive ppos'"""
 
 
 	"""
