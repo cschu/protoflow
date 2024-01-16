@@ -136,18 +136,25 @@ workflow {
 	)
 
 	salmon_results_ch = salmon_quant.out.salmon_counts
-		.map { sample, files ->
+		.map { sample, counts ->
 			sample_id = sample.id.replaceAll(/\.meta[GT](\.singles)?$/, "")
 			sample_lib_id = sample.id.replaceAll(/\.singles$/, "")
-			return tuple(sample_id, files)			
+			return tuple(sample_id, counts)			
 		}
-		.groupTuple(by: 0)
+		.groupTuple(by: 0, size: 4, remainder: true, sort: true)
+		.map { sample_id, counts ->
+			def meta = [:]
+			meta.id = sample_id
+			return tuple(sample, counts)
+		}
 	salmon_results_ch.dump(pretty: true, tag: "salmon_results_ch")
 
 	results_ch = metaP_ch
 		.map { sample_id, sample, files -> return tuple(sample, [files])}
+		.join(proteomes_ch)
 		.join(intersect_miniprot.out.mp_intersect)
 		.join(blastp.out.blastp)
+		.join(salmon_results_ch)
 	results_ch.dump(pretty: true, tag: "results_ch")
 
 	// 1235  singularity exec -B /scratch -B /g/ bedtools_latest.sif bedtools intersect -a /g/scb2/bork/data/MAGs/annotations/internal_MICROB-PREDICT/psa_megahit/prodigal/MPHU23965372ST.psa_megahit.prodigal.gff.gz -b work/86/19e7407ece45ab89080ca4c9df73ea/miniprot/17_I_106_R10/17_I_106_R10.gff -wao > test.overlap.txt
