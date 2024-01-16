@@ -145,7 +145,7 @@ workflow {
 		.map { sample_id, counts ->
 			def meta = [:]
 			meta.id = sample_id
-			return tuple(sample, counts)
+			return tuple(meta, counts)
 		}
 	salmon_results_ch.dump(pretty: true, tag: "salmon_results_ch")
 
