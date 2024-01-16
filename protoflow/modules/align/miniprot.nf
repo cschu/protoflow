@@ -25,7 +25,7 @@ process intersect_miniprot {
 
 	gzip -dc ${genome_gff} | grep -v "#" > genome.gff
 
-	sed "s/ /;coords=/" ${protein_gff} | sed "s/ /-/" > | grep -v "#" > proteins.gff
+	sed "s/ /;coords=/" ${protein_gff} | sed "s/ /-/" | grep -v "#" > proteins.gff
 
 	bedtools intersect -wao -a proteins.gff -b genome.gff > miniprot/intersect/${sample.id}/${sample.id}.gff
 	"""
