@@ -68,7 +68,7 @@ def read_miniprot(f, metaP, id_proteome):
 			pplen = int(p_end) - int(p_start) + 1
 			
 
-			if float(m_attrib.get("Identity", 0)) < 97:
+			if float(m_attrib.get("Identity", 0)) * 100 < 97:
 				continue
 
 			records.append({
