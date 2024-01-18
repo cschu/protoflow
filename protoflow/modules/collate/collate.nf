@@ -21,7 +21,7 @@ process collate_results {
 
 	"""
 
-	collate.py ${sample.id} ${proteins} ${metaP_proteins} ${blastp_results} ${miniprot_results} ${metaG_input} ${metaP_input}
+	collate.py ${sample.id} ${proteins} ${metaP_proteins} ${blastp_results} ${miniprot_results} ${metaG_input} ${metaT_input}
 	"""
 	
 
