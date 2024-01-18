@@ -67,6 +67,10 @@ def read_miniprot(f, metaP, id_proteome):
 			mlen = int(m_end) - int(m_start) + 1
 			pplen = int(p_end) - int(p_start) + 1
 			
+
+			if float(m_attrib.get("Identity", 0)) < 97:
+				continue
+
 			records.append({
 				"qaccver": m_attrib.get("Target"),
 				"saccver": pid,
@@ -74,7 +78,7 @@ def read_miniprot(f, metaP, id_proteome):
 				"length": plen,
 				"qcov": overlap/mlen,
 				"scov": overlap/pplen,
-				"positive": m_attrib.get("Identity"),
+				"positive": m_attrib.get("Positive"),
 				"partial": p_attrib.get("partial", "00") != "00",
 				"qlen": plen,
 				"slen": pplen / 3,
@@ -152,9 +156,9 @@ def main():
 	metaGT_profiles_df = read_metaGT_profiles(proteome_d.values(), metaG_profiles=args.metaG_counts, metaT_profiles=args.metaT_counts)
 
 	# metaP_df.to_csv(f"{args.output_prefix}.metaP_df.tsv", sep="\t", index=False)
-	# blastp_df.to_csv(f"{args.output_prefix}.blastp_df.tsv", sep="\t", index=False)
-	# miniprot_df.to_csv(f"{args.output_prefix}.miniprot_df.tsv", sep="\t", index=False)
-	# metaGT_profiles_df.to_csv(f"{args.output_prefix}.metaGT_profiles_df.tsv", sep="\t", index=False)
+	blastp_df.to_csv(f"{args.output_prefix}.blastp_df.tsv", sep="\t", index=False)
+	miniprot_df.to_csv(f"{args.output_prefix}.miniprot_df.tsv", sep="\t", index=False)
+	metaGT_profiles_df.to_csv(f"{args.output_prefix}.metaGT_profiles_df.tsv", sep="\t", index=False)
 
 
 	prot_combined_df = pd.merge(blastp_df, miniprot_df, on=["qaccver"], how="outer")
