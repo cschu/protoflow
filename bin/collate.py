@@ -158,24 +158,26 @@ def main():
 
 
 	prot_combined_df = pd.merge(blastp_df, miniprot_df, on=["qaccver"], how="inner")
+	prot_combined_filter = (prot_combined_df["saccver_x"] == prot_combined_df["saccver_y"]) | (prot_combined_df["saccver_x"].isna()) | (prot_combined_df["saccver_y"].isna())
+
+	# evidence_both = prot_combined_df[(prot_combined_df["saccver_x"] == prot_combined_df["saccver_y"]) | (prot_combined_df["saccver_x"].isna()) | (prot_combined_df["saccver_y"].isna())]
+	evidence_both_df = prot_combined_df[prot_combined_filter]
+	evidence_both_df = evidence_both_df.assign(saccver=evidence_both_df.saccver_x)
+	evidence_both_df["saccver"] = evidence_both_df["saccver"].fillna(evidence_both_df["saccver_y"])
 
 	evidence_both_df = pd.merge(
-		prot_combined_df[prot_combined_df["saccver_x"] == prot_combined_df["saccver_y"]],
+		# prot_combined_df[prot_combined_filter],
+		evidence_both_df,
 		metaGT_profiles_df,
-		left_on=["saccver_x"],
+		left_on=["saccver"],
 		right_index=True,
 		how="inner",
 	)
 	evidence_both_df.to_csv(f"{args.output_prefix}.evidence_both.tsv", sep="\t", index=False)
 
-	evidence_ambig_df = pd.merge(
-		pd.DataFrame(data=set(metaP_d).difference(evidence_both_df["qaccver"]), columns=["qaccver"]).set_index("qaccver"),
-		prot_combined_df[prot_combined_df["saccver_x"] == prot_combined_df["saccver_y"]],
-		left_index=True,
-		right_on=["qaccver"],
-		how="inner",
-	)
-	evidence_ambig_df.to_csv(f"{args.output_prefix}.evidence_ambig.tsv", sep="\t", index=False)
+	with open(f"{args.output_prefix}.unknown_metaP.txt", "wt") as _out:
+		unseen = set(metaP_d).difference(evidence_both_df["qaccver"].to_list())
+		print(*sorted(unseen), sep="\n", file=_out)
 
 	
 
