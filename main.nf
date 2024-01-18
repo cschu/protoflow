@@ -8,6 +8,8 @@ include { metaT_input; metaG_input } from "./protoflow/workflows/input"
 include { salmon_index; salmon_quant } from "./protoflow/modules/profilers/salmon"
 include { miniprot; intersect_miniprot } from "./protoflow/modules/align/miniprot"
 include { makeblastdb; blastp; filter_blastp } from "./protoflow/modules/align/blast"
+include { collate_results } from "./protoflow/modules/collate/collate"
+
 
 workflow {
 
@@ -156,6 +158,8 @@ workflow {
 		.join(blastp.out.blastp)
 		.join(salmon_results_ch)
 	results_ch.dump(pretty: true, tag: "results_ch")
+
+	collate_results(results_ch)
 
 	// 1235  singularity exec -B /scratch -B /g/ bedtools_latest.sif bedtools intersect -a /g/scb2/bork/data/MAGs/annotations/internal_MICROB-PREDICT/psa_megahit/prodigal/MPHU23965372ST.psa_megahit.prodigal.gff.gz -b work/86/19e7407ece45ab89080ca4c9df73ea/miniprot/17_I_106_R10/17_I_106_R10.gff -wao > test.overlap.txt
  	// 1237  singularity exec -B /scratch -B /g/ bedtools_latest.sif bedtools intersect -b /g/scb2/bork/data/MAGs/annotations/internal_MICROB-PREDICT/psa_megahit/prodigal/MPHU23965372ST.psa_megahit.prodigal.gff.gz -a work/86/19e7407ece45ab89080ca4c9df73ea/miniprot/17_I_106_R10/17_I_106_R10.gff -wao > test.overlap.txt
