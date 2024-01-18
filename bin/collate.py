@@ -157,7 +157,7 @@ def main():
 	# metaGT_profiles_df.to_csv(f"{args.output_prefix}.metaGT_profiles_df.tsv", sep="\t", index=False)
 
 
-	prot_combined_df = pd.merge(blastp_df, miniprot_df, on=["qaccver"], how="inner")
+	prot_combined_df = pd.merge(blastp_df, miniprot_df, on=["qaccver"], how="outer")
 	prot_combined_filter = (prot_combined_df["saccver_x"] == prot_combined_df["saccver_y"]) | (prot_combined_df["saccver_x"].isna()) | (prot_combined_df["saccver_y"].isna())
 
 	# evidence_both = prot_combined_df[(prot_combined_df["saccver_x"] == prot_combined_df["saccver_y"]) | (prot_combined_df["saccver_x"].isna()) | (prot_combined_df["saccver_y"].isna())]
