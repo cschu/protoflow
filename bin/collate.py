@@ -89,26 +89,32 @@ def read_metaGT_profiles(protein_coding_genes, metaG_profiles=None, metaT_profil
 	profiles_df["metaT"] = 0.0
 	profiles_df["Length"] = None
 
+	usecols = ["Name", "Length", "NumReads"]
+
 	if metaG_profiles:
 		for f in metaG_profiles:
 			df = profiles_df.merge(
-				pd.read_csv(f, sep="\t", index_col=0, usecols=["Name", "Length", "NumReads"]),
+				pd.read_csv(f, sep="\t", index_col=0, usecols=usecols),
 				left_index=True,
 				right_index=True,
 				how="outer",
 			)
-			profiles_df["Length"] = df["Length"]
+			if len(usecols) == 3:
+				profiles_df["Length"] = df["Length"]
+				usecols = ["Name", "NumReads"]
 			profiles_df["metaG"] += df["NumReads"]
 
 	if metaT_profiles:
 		for f in metaT_profiles:
 			df = profiles_df.merge(
-				pd.read_csv(f, sep="\t", index_col=0, usecols=["Name", "Length", "NumReads"]),
+				pd.read_csv(f, sep="\t", index_col=0, usecols=usecols),
 				left_index=True,
 				right_index=True,
 				how="outer",
 			)
-			profiles_df["Length"] = df["Length"]
+			if len(usecols) == 3:
+				profiles_df["Length"] = df["Length"]
+				usecols = ["Name", "NumReads"]
 			profiles_df["metaT"] += df["NumReads"]
 	
 	return profiles_df
