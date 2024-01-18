@@ -87,7 +87,7 @@ def read_metaGT_profiles(protein_coding_genes, metaG_profiles=None, metaT_profil
 	profiles_df = pd.DataFrame(index=sorted(protein_coding_genes))
 	profiles_df["metaG"] = 0.0
 	profiles_df["metaT"] = 0.0
-	profiles_df["Length"] = None
+	# profiles_df["Length"] = None
 
 	usecols = ["Name", "Length", "NumReads"]
 
