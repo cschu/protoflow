@@ -151,10 +151,38 @@ def main():
 
 	metaGT_profiles_df = read_metaGT_profiles(proteome_d.values(), metaG_profiles=args.metaG_counts, metaT_profiles=args.metaT_counts)
 
-	metaP_df.to_csv(f"{args.output_prefix}.metaP_df.tsv", sep="\t", index=False)
-	blastp_df.to_csv(f"{args.output_prefix}.blastp_df.tsv", sep="\t", index=False)
-	miniprot_df.to_csv(f"{args.output_prefix}.miniprot_df.tsv", sep="\t", index=False)
-	metaGT_profiles_df.to_csv(f"{args.output_prefix}.metaGT_profiles_df.tsv", sep="\t", index=False)
+	# metaP_df.to_csv(f"{args.output_prefix}.metaP_df.tsv", sep="\t", index=False)
+	# blastp_df.to_csv(f"{args.output_prefix}.blastp_df.tsv", sep="\t", index=False)
+	# miniprot_df.to_csv(f"{args.output_prefix}.miniprot_df.tsv", sep="\t", index=False)
+	# metaGT_profiles_df.to_csv(f"{args.output_prefix}.metaGT_profiles_df.tsv", sep="\t", index=False)
+
+
+	prot_combined_df = pd.merge(blastp_df, miniprot_df, on=["qaccver"], how="inner")
+
+	evidence_both_df = pd.merge(
+		prot_combined_df[prot_combined_df["saccver_x"] == prot_combined_df["saccver_y"]],
+		metaGT_profiles_df,
+		left_on=["saccver_x"],
+		right_index=True,
+		how="inner",
+	)
+	evidence_both_df.to_csv(f"{args.output_prefix}.evidence_both.tsv", sep="\t", index=False)
+
+	evidence_ambig_df = pd.merge(
+		pd.DataFrame(data=set(metaP_d).difference(evidence_both_df["qaccver"]), columns=["qaccver"]).set_index("qaccver"),
+		prot_combined_df[prot_combined_df["saccver_x"] == prot_combined_df["saccver_y"]],
+		left_index=True,
+		right_on=["qaccver"],
+		how="inner",
+	)
+	evidence_ambig_df.to_csv(f"{args.output_prefix}.evidence_ambig.tsv", sep="\t", index=False)
+
+	
+
+	
+	
+
+
 
 
 if __name__ == "__main__":
