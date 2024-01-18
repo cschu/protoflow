@@ -99,6 +99,7 @@ def read_metaGT_profiles(protein_coding_genes, metaG_profiles=None, metaT_profil
 				right_index=True,
 				how="outer",
 			)
+			print(df.head())
 			if len(usecols) == 3:
 				profiles_df["Length"] = df["Length"]
 				usecols = ["Name", "NumReads"]
