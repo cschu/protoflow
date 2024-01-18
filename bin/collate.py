@@ -139,7 +139,7 @@ def main():
 
 	proteome_d = read_proteome(args.predicted_proteins)
 	metaP_d, metaP_df = read_metaP_data(args.metaP_proteins)
-	blastp_df = read_blastp(args.blast_output, metaP_df)
+	blastp_df = read_blastp(args.blastp_output, metaP_df)
 	miniprot_df = read_miniprot(args.miniprot_output, metaP_d, proteome_d)
 
 	metaGT_profiles_df = read_metaGT_profiles(proteome_d.values(), metaG_profiles=args.metaG_counts, metaT_profiles=args.metaT_counts)
