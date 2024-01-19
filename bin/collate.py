@@ -87,11 +87,11 @@ def read_miniprot(f, metaP, id_proteome):
 			records.append({
 				"qaccver": m_attrib.get("Target"),
 				"saccver": pid,
-				"pident": m_attrib.get("Identity"),
+				"pident": float(m_attrib.get("Identity")),
 				"length": plen,
 				"qcov": overlap/mlen,
 				"scov": overlap/pplen,
-				"positive": m_attrib.get("Positive"),
+				"positive": float(m_attrib.get("Positive")),
 				"partial": p_attrib.get("partial", "00") != "00",
 				"qlen": plen,
 				"slen": pplen / 3,
