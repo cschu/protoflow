@@ -43,7 +43,7 @@ def read_blastp(f, metaP_df, hi_conf_pident_cutoff=97, lo_conf_pident_cutoff=33,
 	return blastp_combined_df
 
 def filter_miniprot(df, metaP_df, hi_conf_pident_cutoff=97, lo_conf_pident_cutoff=33, qcovs_cutoff=97):
-	df_hi = df[(df["pident"] * 100 > hi_conf_pident_cutoff) & (df[df["qcov"] * 100 > qcovs_cutoff])]
+	df_hi = df[(df["pident"] * 100 > hi_conf_pident_cutoff) & (df["qcov"] * 100 > qcovs_cutoff)]
 	df_hi = pd.merge(df_hi, metaP_df, right_on="qaccver", left_on="qaccver", how="outer")  # .drop(["mismatch", "gapopen", "qstart", "qend", "sstart", "send"], axis=1)
 	df_hi["confidence"] = "high"
 
