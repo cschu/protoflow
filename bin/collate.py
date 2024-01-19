@@ -42,6 +42,19 @@ def read_blastp(f, metaP_df, hi_conf_pident_cutoff=97, lo_conf_pident_cutoff=33,
 
 	return blastp_combined_df
 
+def filter_miniprot(df, metaP_df, hi_conf_pident_cutoff=97, lo_conf_pident_cutoff=33, qcovs_cutoff=97):
+	df_hi = df[(df["pident"] * 100 > hi_conf_pident_cutoff) & df[df["qcov"] * 100 > qcovs_cutoff]]
+	df_hi = pd.merge(df_hi, metaP_df, right_on="qaccver", left_on="qaccver", how="outer")  # .drop(["mismatch", "gapopen", "qstart", "qend", "sstart", "send"], axis=1)
+	df_hi["confidence"] = "high"
+
+	unseen_df = pd.DataFrame(df_hi[df_hi["saccver"].isna()]["qaccver"]).set_index(["qaccver"])
+
+	df_lo = df[((df["pident"] * 100 > lo_conf_pident_cutoff) & (df["pident"] * 100 <= hi_conf_pident_cutoff)) & (df["qcov"] > qcovs_cutoff)]
+	df_lo = pd.merge(df_lo, unseen_df, right_on="qaccver", left_on="qaccver", how="inner")  # .drop(["mismatch", "gapopen", "qstart", "qend", "sstart", "send"], axis=1)
+	df_lo["confidence"] = "low"
+
+	return pd.concat([df_hi, df_lo]).sort_values(["qaccver", "confidence"])
+
 def read_miniprot(f, metaP, id_proteome):
 
 	def parse_attrib(s):
@@ -68,8 +81,8 @@ def read_miniprot(f, metaP, id_proteome):
 			pplen = int(p_end) - int(p_start) + 1
 			
 
-			if float(m_attrib.get("Identity", 0)) * 100 < 97:
-				continue
+			# if float(m_attrib.get("Identity", 0)) * 100 < 97:
+			# 	continue
 
 			records.append({
 				"qaccver": m_attrib.get("Target"),
@@ -86,6 +99,10 @@ def read_miniprot(f, metaP, id_proteome):
 			})
 	
 	return pd.DataFrame.from_records(records)
+
+
+
+
 
 def read_metaGT_profiles(protein_coding_genes, metaG_profiles=None, metaT_profiles=None):
 	profiles_df = pd.DataFrame(index=sorted(protein_coding_genes))
@@ -152,6 +169,7 @@ def main():
 	metaP_d, metaP_df = read_metaP_data(args.metaP_proteins)
 	blastp_df = read_blastp(args.blastp_output, metaP_df)
 	miniprot_df = read_miniprot(args.miniprot_output, metaP_d, proteome_d)
+	miniprot_df =filter_miniprot(miniprot_df, metaP_df)
 
 	metaGT_profiles_df = read_metaGT_profiles(proteome_d.values(), metaG_profiles=args.metaG_counts, metaT_profiles=args.metaT_counts)
 
