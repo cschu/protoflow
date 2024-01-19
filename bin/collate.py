@@ -195,7 +195,7 @@ def main():
 		right_index=True,
 		how="inner",
 	)
-	evidence_both_df.to_csv(f"{args.output_prefix}.evidence_both.tsv", sep="\t", index=False)
+	evidence_both_df.to_csv(f"{args.output_prefix}.metaP_hits.tsv", sep="\t", index=False)
 
 	with open(f"{args.output_prefix}.unknown_metaP.txt", "wt") as _out:
 		unseen = set(metaP_d).difference(evidence_both_df["qaccver"].to_list())

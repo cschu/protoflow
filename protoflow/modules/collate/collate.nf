@@ -4,7 +4,7 @@ process collate_results {
 	tuple val(sample), path(metaP_proteins), path(proteins), path(miniprot_results), path(blastp_results), path(salmon_results)
 
 	output:
-	tuple val(sample), path("collated/${sample.id}/${sample.id}.tsv"), emit: collated
+	tuple val(sample), path("collated/${sample.id}/${sample.id}.metaP_hits.tsv"), emit: collated
 	tuple val(sample), path("collated/${sample.id}/${sample.id}.unknown_metaP.txt"), emit: unknown_metaP
 
 	script:
