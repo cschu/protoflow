@@ -3,6 +3,9 @@ process collate_results {
 	input:
 	tuple val(sample), path(metaP_proteins), path(proteins), path(miniprot_results), path(blastp_results), path(salmon_results)
 
+	output:
+	tuple val(sample), path("collated/${sample.id}/${sample.id}.*tsv"), emit: collated
+
 	script:
 
 	metaG_files = salmon_results.findAll( { it.name.matches("(.*)metaG(.*)") } )
@@ -20,8 +23,9 @@ process collate_results {
 	}    
 
 	"""
+	mkdir -p collated/${sample.id}/
 
-	collate.py ${sample.id} ${proteins} ${metaP_proteins} ${blastp_results} ${miniprot_results} ${metaG_input} ${metaT_input}
+	collate.py -o collated/${sample.id}/${sample.id} ${proteins} ${metaP_proteins} ${blastp_results} ${miniprot_results} ${metaG_input} ${metaT_input}
 	"""
 	
 

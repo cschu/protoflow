@@ -155,7 +155,7 @@ def read_metaGT_profiles(protein_coding_genes, metaG_profiles=None, metaT_profil
 
 def main():
 	ap = argparse.ArgumentParser()
-	ap.add_argument("sample_id", type=str)
+	# ap.add_argument("sample_id", type=str)
 	ap.add_argument("predicted_proteins", type=str)
 	ap.add_argument("metaP_proteins", type=str)
 	ap.add_argument("blastp_output", type=str)
