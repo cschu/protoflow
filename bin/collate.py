@@ -5,10 +5,17 @@ import gzip
 
 import pandas as pd
 
+
+def parse_attrib(s):
+	return dict(item.split("=") for item in s.strip().strip(";").split(";"))
+	
 def read_proteome(f):
 	def parse_protein(line):
+		# >k141_0_1 # 2 # 313 # 1 # ID=1_1;partial=11;start_type=Edge;rbs_motif=None;rbs_spacer=None;gc_cont=0.577
 		line = line.strip()[1:].split(" ")
-		return line[8].split(";")[0].split("=")[1], line[0]
+		d = parse_attrib(line[8])
+		# return line[8].split(";")[0].split("=")[1], line[0]
+		return d.get("ID"), (line[0], d.get("partial", "00") != "00")
 
 	open_f = gzip.open if f.endswith(".gz") else open
 	with open_f(f, "rt") as _in:
@@ -58,9 +65,6 @@ def filter_miniprot(df, metaP_df, hi_conf_pident_cutoff=97, lo_conf_pident_cutof
 
 def read_miniprot(f, metaP, id_proteome):
 
-	def parse_attrib(s):
-		return dict(item.split("=") for item in s.strip(";").split(";"))
-	
 	with open(f, "rt") as _in:
 		records = []
 		for line in _in:
@@ -77,7 +81,7 @@ def read_miniprot(f, metaP, id_proteome):
 			
 			overlap = int(overlap)
 			plen = int(metaP.get(m_attrib.get("Target")))
-			pid = id_proteome.get(p_attrib.get("ID"))
+			pid = id_proteome.get(p_attrib.get("ID", [None]))[0]
 			mlen = int(m_end) - int(m_start) + 1
 			pplen = int(p_end) - int(p_start) + 1
 			
@@ -93,7 +97,7 @@ def read_miniprot(f, metaP, id_proteome):
 				"qcov": overlap/mlen,
 				"scov": overlap/pplen,
 				"positive": float(m_attrib.get("Positive")),
-				"prodigal_partial": p_attrib.get("partial", "00") != "00",
+				# "prodigal_partial": p_attrib.get("partial", "00") != "00",
 				"qlen": plen,
 				"slen": pplen / 3,
 				"rank": int(m_attrib.get("Rank", -1)),
@@ -172,7 +176,7 @@ def main():
 	miniprot_df = read_miniprot(args.miniprot_output, metaP_d, proteome_d)
 	miniprot_df = filter_miniprot(miniprot_df, metaP_df)
 
-	metaGT_profiles_df = read_metaGT_profiles(proteome_d.values(), metaG_profiles=args.metaG_counts, metaT_profiles=args.metaT_counts)
+	metaGT_profiles_df = read_metaGT_profiles([pid for pid, _ in proteome_d.values()], metaG_profiles=args.metaG_counts, metaT_profiles=args.metaT_counts)
 
 	# metaP_df.to_csv(f"{args.output_prefix}.metaP_df.tsv", sep="\t", index=False)
 	blastp_df.to_csv(f"{args.output_prefix}.blastp_df.tsv", sep="\t", index=False)
@@ -205,6 +209,8 @@ def main():
 	 	["saccver_blastp", "saccver_miniprot", "qlen_blastp", "qlen_miniprot", "slen_blastp", "slen_miniprot",],
 	 	axis=1,
 	)
+
+	evidence_both_df["prodigal_partial"] = [proteome_d.get(p, (None,))[-1] for p in evidence_both_df["prodigal_protein"]]
 
 	# metaP_protein	pident_blastp	length_blastp	evalue	bitscore	qlen_blastp	slen_blastp	qcovs	positive_blastp	ppos	confidence_blastp	pident_miniprot	length_miniprot	qcov	scov	positive_miniprot	prodigal_partial	qlen_miniprot	slen_miniprot	rank	confidence_miniprot	prodigal_protein	metaG	metaT
 	# pident_blastp	length_blastp	evalue	bitscore	qlen_blastp	slen_blastp	qcovs	positive_blastp	ppos		pident_miniprot	length_miniprot	qcov	scov	positive_miniprot	qlen_miniprot	slen_miniprot	rank	
