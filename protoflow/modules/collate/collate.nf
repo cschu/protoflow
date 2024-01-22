@@ -5,6 +5,7 @@ process collate_results {
 
 	output:
 	tuple val(sample), path("collated/${sample.id}/${sample.id}.metaP_hits.tsv"), emit: collated
+	tuple val(sample), path("collated/${sample.id}/${sample.id}.no_metaP_hits.tsv"), emit: no_metaP
 	tuple val(sample), path("collated/${sample.id}/${sample.id}.unknown_metaP.txt"), emit: unknown_metaP
 
 	script:

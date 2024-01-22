@@ -49,6 +49,14 @@ def read_blastp(f, metaP_df, hi_conf_pident_cutoff=97, lo_conf_pident_cutoff=33,
 
 	return blastp_combined_df
 
+# def read_blastp_rev(f, metaP_df, hi_conf_pident_cutoff=97, lo_conf_pident_cutoff=33, qcovs_cutoff=97):
+# 	header = 'qaccver saccver pident length mismatch gapopen qstart qend sstart send evalue bitscore qlen slen qcovs positive ppos'.split(" ")
+# 	blastp_df = pd.read_csv(f, sep="\t", names=header)
+
+
+
+
+
 def filter_miniprot(df, metaP_df, hi_conf_pident_cutoff=97, lo_conf_pident_cutoff=33, qcovs_cutoff=97):
 	df_hi = df[(df["pident"] * 100 > hi_conf_pident_cutoff) & (df["qcov"] * 100 > qcovs_cutoff)]
 	df_hi = pd.merge(df_hi, metaP_df, right_on="qaccver", left_on="qaccver", how="outer")  # .drop(["mismatch", "gapopen", "qstart", "qend", "sstart", "send"], axis=1)
@@ -259,8 +267,20 @@ def main():
 		print(*sorted(unseen), sep="\n", file=_out)
 
 	
-
-	
+	proteome_df = pd.merge(
+		pd.DataFrame(data=partial_d.keys(), columns=["prodigal_protein"]),
+		evidence_both_df[["metaP_protein", "prodigal_protein"]],
+		how="outer",
+		on=["prodigal_protein"],
+	)
+	proteome_df = pd.merge(
+		proteome_df[proteome_df["metaP_protein"].isna()],
+		metaGT_profiles_df.drop(["Length"], axis=1),
+		left_on=["prodigal_protein"],
+		right_index=True,
+		how="inner",
+	)
+	proteome_df.to_csv(f"{args.output_prefix}.no_metaP_hits.tsv", sep="\t", index=False)
 	
 
 
