@@ -195,13 +195,13 @@ def main():
 		right_index=True,
 		how="inner",
 	).rename(
-		{
+		columns={
 			"qaccver": "metaP_protein",			
 		}
+	).drop(
+	 	["saccver_bp", "saccver_mp"],
+	 	axis=1,
 	)
-	# .drop(
-	# 	["saccver_x", "saccver_y"],
-	# 	axis=1,
 
 	# qaccver        pident_x        length_x        evalue  bitscore        qlen_x  slen_x  qcovs   positive_x      ppos    confidence_x    pident_y        length_y        qcov    scov    positive_y      partial qlen_y  slen_y  rank    confidence_y   saccver metaG   metaT   Length
 
