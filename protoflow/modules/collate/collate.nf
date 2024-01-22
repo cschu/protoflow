@@ -31,22 +31,18 @@ process collate_results {
 
 }
 
+process extract_unknown_proteins {
+	input:
+	tuple val(sample), path(metaP_proteins) path(unknown_proteins)
 
-// process collate_protein_hits {
+	output:
+	tuple val(sample), path("unknown/${sample.id}/${sample.id}.faa"), emit: unknown_proteins
 
-// 	input:
-// 	tuple val(sample), path(proteomics_proteins), path(hi_conf_proteins), path(lo_conf_proteins)
-	
-// 	output:
-// 	tuple val(sample), path("collated_proteins/${sample.id}/${sample.id}.protein_hits.tsv"), emit: protein_hits
+	script:
+	"""
+	mkdir -p unknown/${sample.id}/${sample.id}.faa
+	seqtk subseq ${metaP_proteins} ${unknown_proteins} > unknown/${sample.id}/${sample.id}.faa
+	"""
 
-// 	script:
-// 	"""
-// 	mkdir -p collated_proteins/${sample.id}/
+}
 
-
-// 	"""
-
-
-
-// }
