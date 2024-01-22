@@ -210,7 +210,9 @@ def main():
 	 	axis=1,
 	)
 
-	evidence_both_df["prodigal_partial"] = [proteome_d.get(p, (None,))[-1] for p in evidence_both_df["prodigal_protein"]]
+	partial_d = {pid: partial for pid, partial in proteome_d.items()}
+
+	evidence_both_df["prodigal_partial"] = [partial_d.get(p, None) for p in evidence_both_df["prodigal_protein"]]
 
 	# metaP_protein	pident_blastp	length_blastp	evalue	bitscore	qlen_blastp	slen_blastp	qcovs	positive_blastp	ppos	confidence_blastp	pident_miniprot	length_miniprot	qcov	scov	positive_miniprot	prodigal_partial	qlen_miniprot	slen_miniprot	rank	confidence_miniprot	prodigal_protein	metaG	metaT
 	# pident_blastp	length_blastp	evalue	bitscore	qlen_blastp	slen_blastp	qcovs	positive_blastp	ppos		pident_miniprot	length_miniprot	qcov	scov	positive_miniprot	qlen_miniprot	slen_miniprot	rank	
