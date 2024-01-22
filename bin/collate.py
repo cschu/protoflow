@@ -279,7 +279,7 @@ def main():
 		left_on=["prodigal_protein"],
 		right_index=True,
 		how="inner",
-	)
+	).drop(["metaP_protein"], axis=1)
 	proteome_df.to_csv(f"{args.output_prefix}.no_metaP_hits.tsv", sep="\t", index=False)
 	
 
