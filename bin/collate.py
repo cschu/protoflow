@@ -48,6 +48,7 @@ def filter_miniprot(df, metaP_df, hi_conf_pident_cutoff=97, lo_conf_pident_cutof
 	df_hi["confidence"] = "high"
 
 	unseen_df = pd.DataFrame(df_hi[df_hi["saccver"].isna()]["qaccver"]).set_index(["qaccver"])
+	df_hi = df_hi[df_hi["saccver"].notna()]
 
 	df_lo = df[((df["pident"] * 100 > lo_conf_pident_cutoff) & (df["pident"] * 100 <= hi_conf_pident_cutoff)) & (df["qcov"] * 100 > qcovs_cutoff)]
 	df_lo = pd.merge(df_lo, unseen_df, right_on="qaccver", left_on="qaccver", how="inner")  # .drop(["mismatch", "gapopen", "qstart", "qend", "sstart", "send"], axis=1)
@@ -169,7 +170,7 @@ def main():
 	metaP_d, metaP_df = read_metaP_data(args.metaP_proteins)
 	blastp_df = read_blastp(args.blastp_output, metaP_df)
 	miniprot_df = read_miniprot(args.miniprot_output, metaP_d, proteome_d)
-	miniprot_df =filter_miniprot(miniprot_df, metaP_df)
+	miniprot_df = filter_miniprot(miniprot_df, metaP_df)
 
 	metaGT_profiles_df = read_metaGT_profiles(proteome_d.values(), metaG_profiles=args.metaG_counts, metaT_profiles=args.metaT_counts)
 
@@ -179,13 +180,13 @@ def main():
 	metaGT_profiles_df.to_csv(f"{args.output_prefix}.metaGT_profiles_df.tsv", sep="\t", index=False)
 
 
-	prot_combined_df = pd.merge(blastp_df, miniprot_df, on=["qaccver"], how="outer", suffixes=("_bp", "_mp"))
-	prot_combined_filter = (prot_combined_df["saccver_bp"] == prot_combined_df["saccver_mp"]) | (prot_combined_df["saccver_bp"].isna()) | (prot_combined_df["saccver_mp"].isna())
+	prot_combined_df = pd.merge(blastp_df, miniprot_df, on=["qaccver"], how="outer", suffixes=("_blastp", "_miniprot"))
+	prot_combined_filter = (prot_combined_df["saccver_blastp"] == prot_combined_df["saccver_miniprot"]) | (prot_combined_df["saccver_blastp"].isna()) | (prot_combined_df["saccver_miniprot"].isna())
 
 	# evidence_both = prot_combined_df[(prot_combined_df["saccver_x"] == prot_combined_df["saccver_y"]) | (prot_combined_df["saccver_x"].isna()) | (prot_combined_df["saccver_y"].isna())]
 	evidence_both_df = prot_combined_df[prot_combined_filter]
-	evidence_both_df = evidence_both_df.assign(prodigal_protein=evidence_both_df.saccver_bp)
-	evidence_both_df["prodigal_protein"] = evidence_both_df["prodigal_protein"].fillna(evidence_both_df["saccver_mp"])
+	evidence_both_df = evidence_both_df.assign(prodigal_protein=evidence_both_df.saccver_blastp)
+	evidence_both_df["prodigal_protein"] = evidence_both_df["prodigal_protein"].fillna(evidence_both_df["saccver_miniprot"])
 
 	evidence_both_df = pd.merge(
 		# prot_combined_df[prot_combined_filter],
@@ -199,7 +200,7 @@ def main():
 			"qaccver": "metaP_protein",			
 		}
 	).drop(
-	 	["saccver_bp", "saccver_mp"],
+	 	["saccver_blastp", "saccver_miniprot"],
 	 	axis=1,
 	)
 
