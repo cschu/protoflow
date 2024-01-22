@@ -185,9 +185,10 @@ def main():
 
 	# evidence_both = prot_combined_df[(prot_combined_df["saccver_x"] == prot_combined_df["saccver_y"]) | (prot_combined_df["saccver_x"].isna()) | (prot_combined_df["saccver_y"].isna())]
 	evidence_both_df = prot_combined_df[prot_combined_filter]
-	evidence_both_df = evidence_both_df.assign(prodigal_protein=evidence_both_df.saccver_blastp, qlen_aa=evidence_both_df.qlen_blastp)
+	evidence_both_df = evidence_both_df.assign(prodigal_protein=evidence_both_df.saccver_blastp, qlen_aa=evidence_both_df.qlen_blastp, slen_aa=evidence_both_df.slen_blastp)
 	evidence_both_df["prodigal_protein"] = evidence_both_df["prodigal_protein"].fillna(evidence_both_df["saccver_miniprot"])
 	evidence_both_df["qlen_aa"] = evidence_both_df["qlen_aa"].fillna(evidence_both_df["qlen_miniprot"])
+	evidence_both_df["slen_aa"] = evidence_both_df["slen_aa"].fillna(evidence_both_df["slen_miniprot"])
 
 	evidence_both_df = pd.merge(
 		# prot_combined_df[prot_combined_filter],
@@ -201,12 +202,12 @@ def main():
 			"qaccver": "metaP_protein",			
 		}
 	).drop(
-	 	["saccver_blastp", "saccver_miniprot", "qlen_blastp", "qlen_miniprot",],
+	 	["saccver_blastp", "saccver_miniprot", "qlen_blastp", "qlen_miniprot", "slen_blastp", "slen_miniprot",],
 	 	axis=1,
 	)
 
 	# metaP_protein	pident_blastp	length_blastp	evalue	bitscore	qlen_blastp	slen_blastp	qcovs	positive_blastp	ppos	confidence_blastp	pident_miniprot	length_miniprot	qcov	scov	positive_miniprot	prodigal_partial	qlen_miniprot	slen_miniprot	rank	confidence_miniprot	prodigal_protein	metaG	metaT
-	# metaP_protein	pident_blastp	length_blastp	evalue	bitscore	qlen_blastp	slen_blastp	qcovs	positive_blastp	ppos		pident_miniprot	length_miniprot	qcov	scov	positive_miniprot	qlen_miniprot	slen_miniprot	rank	
+	# pident_blastp	length_blastp	evalue	bitscore	qlen_blastp	slen_blastp	qcovs	positive_blastp	ppos		pident_miniprot	length_miniprot	qcov	scov	positive_miniprot	qlen_miniprot	slen_miniprot	rank	
 
 	evidence_both_df = evidence_both_df[
 		[
@@ -217,7 +218,21 @@ def main():
 			"metaT",
 			"confidence_blastp",
 			"confidence_miniprot",
-
+			"qlen_aa",
+			"slen_aa",
+			"pident_blastp",
+			"evalue",
+			"bitscore",
+			"qcovs",
+			"positive_blastp",
+			"ppos",
+			"pident_miniprot",
+			"length_blastp",
+			"length_miniprot",
+			"qcov",
+			"scov",
+			"positive_miniprot",
+			"rank",
 		]
 	]
 
