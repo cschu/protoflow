@@ -40,7 +40,7 @@ process extract_unknown_proteins {
 
 	script:
 	"""
-	mkdir -p unknown/${sample.id}/${sample.id}.faa
+	mkdir -p unknown/${sample.id}/
 	seqtk subseq ${metaP_proteins} ${unknown_proteins} > unknown/${sample.id}/${sample.id}.faa
 	"""
 
