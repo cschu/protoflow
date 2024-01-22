@@ -15,7 +15,7 @@ def read_proteome(f):
 		line = line.strip()[1:].split(" ")
 		d = parse_attrib(line[8])
 		# return line[8].split(";")[0].split("=")[1], line[0]
-		return d.get("ID"), (line[0], d.get("partial", "00") != "00")
+		return d.get("ID"), (line[0], d.get("partial"))
 
 	open_f = gzip.open if f.endswith(".gz") else open
 	with open_f(f, "rt") as _in:
@@ -231,18 +231,15 @@ def main():
 			"qlen_aa",
 			"slen_aa",
 			"pident_blastp",
-			"evalue",
-			"bitscore",
-			"qcovs",
-			"positive_blastp",
-			"ppos",
 			"pident_miniprot",
-			"length_blastp",
-			"length_miniprot",
-			"qcov",
-			"scov",
-			"positive_miniprot",
-			"rank",
+			"evalue_blastp",
+			"bitscore_blastp",
+			"ppos_blastp",
+			"ppos_miniprot",
+			"qcovs_blastp",
+			"qcov_miniprot",
+			"scov_miniprot",
+			"rank_miniprot",
 		]
 	]
 
