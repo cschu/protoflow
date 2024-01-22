@@ -165,8 +165,8 @@ workflow {
 	collate_results(results_ch)
 
 	extract_unknown_proteins(
-		collate_results.out.unknown_metaP
-			.join(metaP_ch_sample_only_ch, by: 0)
+		metaP_ch_sample_only_ch
+			.join(collate_results.out.unknown_metaP, by: 0)
 	)
 
 	// 1235  singularity exec -B /scratch -B /g/ bedtools_latest.sif bedtools intersect -a /g/scb2/bork/data/MAGs/annotations/internal_MICROB-PREDICT/psa_megahit/prodigal/MPHU23965372ST.psa_megahit.prodigal.gff.gz -b work/86/19e7407ece45ab89080ca4c9df73ea/miniprot/17_I_106_R10/17_I_106_R10.gff -wao > test.overlap.txt
