@@ -210,7 +210,7 @@ def main():
 	 	axis=1,
 	)
 
-	partial_d = {pid: partial for pid, partial in proteome_d.items()}
+	partial_d = {pid: partial for pid, partial in proteome_d.values()}
 
 	print(*list(partial_d.items()), sep="\n")
 
