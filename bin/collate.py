@@ -203,7 +203,15 @@ def main():
 		how="inner",
 	).rename(
 		columns={
-			"qaccver": "metaP_protein",			
+			"qaccver": "metaP_protein",
+			"evalue": "evalue_blastp",
+			"bitscore": "bitscore_blastp", 
+			"ppos": "ppos_blastp",
+			"positive_miniprot": "ppos_miniprot",
+			"qcovs": "qcovs_blastp", 
+			"qcov": "qcov_miniprot",
+			"scov": "scov_miniprot",
+			"rank": "rank_miniprot",
 		}
 	).drop(
 	 	["saccver_blastp", "saccver_miniprot", "qlen_blastp", "qlen_miniprot", "slen_blastp", "slen_miniprot",],
