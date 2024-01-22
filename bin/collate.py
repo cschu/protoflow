@@ -185,13 +185,14 @@ def main():
 
 	# evidence_both = prot_combined_df[(prot_combined_df["saccver_x"] == prot_combined_df["saccver_y"]) | (prot_combined_df["saccver_x"].isna()) | (prot_combined_df["saccver_y"].isna())]
 	evidence_both_df = prot_combined_df[prot_combined_filter]
-	evidence_both_df = evidence_both_df.assign(prodigal_protein=evidence_both_df.saccver_blastp)
+	evidence_both_df = evidence_both_df.assign(prodigal_protein=evidence_both_df.saccver_blastp, qlen_aa=evidence_both_df.qlen_blastp)
 	evidence_both_df["prodigal_protein"] = evidence_both_df["prodigal_protein"].fillna(evidence_both_df["saccver_miniprot"])
+	evidence_both_df["qlen_aa"] = evidence_both_df["qlen_aa"].fillna(evidence_both_df["qlen_miniprot"])
 
 	evidence_both_df = pd.merge(
 		# prot_combined_df[prot_combined_filter],
 		evidence_both_df,
-		metaGT_profiles_df,
+		metaGT_profiles_df.drop(["Length"], axis=1),
 		left_on=["prodigal_protein"],
 		right_index=True,
 		how="inner",
@@ -200,11 +201,25 @@ def main():
 			"qaccver": "metaP_protein",			
 		}
 	).drop(
-	 	["saccver_blastp", "saccver_miniprot"],
+	 	["saccver_blastp", "saccver_miniprot", "qlen_blastp", "qlen_miniprot",],
 	 	axis=1,
 	)
 
-	# qaccver        pident_x        length_x        evalue  bitscore        qlen_x  slen_x  qcovs   positive_x      ppos    confidence_x    pident_y        length_y        qcov    scov    positive_y      partial qlen_y  slen_y  rank    confidence_y   saccver metaG   metaT   Length
+	# metaP_protein	pident_blastp	length_blastp	evalue	bitscore	qlen_blastp	slen_blastp	qcovs	positive_blastp	ppos	confidence_blastp	pident_miniprot	length_miniprot	qcov	scov	positive_miniprot	prodigal_partial	qlen_miniprot	slen_miniprot	rank	confidence_miniprot	prodigal_protein	metaG	metaT
+	# metaP_protein	pident_blastp	length_blastp	evalue	bitscore	qlen_blastp	slen_blastp	qcovs	positive_blastp	ppos		pident_miniprot	length_miniprot	qcov	scov	positive_miniprot	qlen_miniprot	slen_miniprot	rank	
+
+	evidence_both_df = evidence_both_df[
+		[
+			"metaP_protein",
+			"prodigal_protein",
+			"prodigal_partial",
+			"metaG",
+			"metaT",
+			"confidence_blastp",
+			"confidence_miniprot",
+
+		]
+	]
 
 
 	evidence_both_df.to_csv(f"{args.output_prefix}.metaP_hits.tsv", sep="\t", index=False)
