@@ -33,7 +33,7 @@ process collate_results {
 
 process extract_unknown_proteins {
 	input:
-	tuple val(sample), path(metaP_proteins) path(unknown_proteins)
+	tuple val(sample), path(metaP_proteins), path(unknown_proteins)
 
 	output:
 	tuple val(sample), path("unknown/${sample.id}/${sample.id}.faa"), emit: unknown_proteins
