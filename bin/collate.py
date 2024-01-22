@@ -92,7 +92,7 @@ def read_miniprot(f, metaP, id_proteome):
 				"qcov": overlap/mlen,
 				"scov": overlap/pplen,
 				"positive": float(m_attrib.get("Positive")),
-				"partial": p_attrib.get("partial", "00") != "00",
+				"prodigal_partial": p_attrib.get("partial", "00") != "00",
 				"qlen": plen,
 				"slen": pplen / 3,
 				"rank": int(m_attrib.get("Rank", -1)),
@@ -179,22 +179,33 @@ def main():
 	metaGT_profiles_df.to_csv(f"{args.output_prefix}.metaGT_profiles_df.tsv", sep="\t", index=False)
 
 
-	prot_combined_df = pd.merge(blastp_df, miniprot_df, on=["qaccver"], how="outer")
-	prot_combined_filter = (prot_combined_df["saccver_x"] == prot_combined_df["saccver_y"]) | (prot_combined_df["saccver_x"].isna()) | (prot_combined_df["saccver_y"].isna())
+	prot_combined_df = pd.merge(blastp_df, miniprot_df, on=["qaccver"], how="outer", suffixes=("_bp", "_mp"))
+	prot_combined_filter = (prot_combined_df["saccver_bp"] == prot_combined_df["saccver_mp"]) | (prot_combined_df["saccver_bp"].isna()) | (prot_combined_df["saccver_mp"].isna())
 
 	# evidence_both = prot_combined_df[(prot_combined_df["saccver_x"] == prot_combined_df["saccver_y"]) | (prot_combined_df["saccver_x"].isna()) | (prot_combined_df["saccver_y"].isna())]
 	evidence_both_df = prot_combined_df[prot_combined_filter]
-	evidence_both_df = evidence_both_df.assign(saccver=evidence_both_df.saccver_x)
-	evidence_both_df["saccver"] = evidence_both_df["saccver"].fillna(evidence_both_df["saccver_y"])
+	evidence_both_df = evidence_both_df.assign(prodigal_protein=evidence_both_df.saccver_bp)
+	evidence_both_df["prodigal_protein"] = evidence_both_df["prodigal_protein"].fillna(evidence_both_df["saccver_mp"])
 
 	evidence_both_df = pd.merge(
 		# prot_combined_df[prot_combined_filter],
 		evidence_both_df,
 		metaGT_profiles_df,
-		left_on=["saccver"],
+		left_on=["prodigal_protein"],
 		right_index=True,
 		how="inner",
+	).rename(
+		{
+			"qaccver": "metaP_protein",			
+		}
 	)
+	# .drop(
+	# 	["saccver_x", "saccver_y"],
+	# 	axis=1,
+
+	# qaccver        pident_x        length_x        evalue  bitscore        qlen_x  slen_x  qcovs   positive_x      ppos    confidence_x    pident_y        length_y        qcov    scov    positive_y      partial qlen_y  slen_y  rank    confidence_y   saccver metaG   metaT   Length
+
+
 	evidence_both_df.to_csv(f"{args.output_prefix}.metaP_hits.tsv", sep="\t", index=False)
 
 	with open(f"{args.output_prefix}.unknown_metaP.txt", "wt") as _out:
