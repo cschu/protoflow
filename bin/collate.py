@@ -120,7 +120,9 @@ def read_miniprot(f, metaP, id_proteome):
 def read_metaGT_profiles(protein_coding_genes, metaG_profiles=None, metaT_profiles=None):
 	profiles_df = pd.DataFrame(index=sorted(protein_coding_genes))
 	profiles_df["metaG"] = 0.0
+	profiles_df["metaG_tpm"] = 0.0
 	profiles_df["metaT"] = 0.0
+	profiles_df["metaT_tpm"] = 0.0
 	# profiles_df["Length"] = None
 
 	usecols = ["Name", "Length", "NumReads"]
@@ -247,7 +249,9 @@ def main():
 			"prodigal_protein",
 			"prodigal_partial",
 			"metaG",
+			"metaG_tpm",
 			"metaT",
+			"metaT_tpm",
 			"confidence_blastp",
 			"confidence_miniprot",
 			"qlen_aa",
