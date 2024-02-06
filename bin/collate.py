@@ -123,7 +123,7 @@ def read_metaGT_profiles(protein_coding_genes, metaG_profiles=None, metaT_profil
 	profiles_df["metaT"] = 0.0
 	# profiles_df["Length"] = None
 
-	usecols = ["Name", "Length", "NumReads"]
+	has_length = False
 
 	if metaG_profiles:
 		for f in metaG_profiles:
@@ -134,9 +134,9 @@ def read_metaGT_profiles(protein_coding_genes, metaG_profiles=None, metaT_profil
 				how="outer",
 			)
 			print(df.head())
-			if len(usecols) == 3:
+			if not has_length:
 				profiles_df["Length"] = df["Length"]
-				usecols = ["Name", "NumReads"]
+				has_length = True
 			profiles_df["metaG"] += df["NumReads"]
 
 	if metaT_profiles:
@@ -147,10 +147,16 @@ def read_metaGT_profiles(protein_coding_genes, metaG_profiles=None, metaT_profil
 				right_index=True,
 				how="outer",
 			)
-			if len(usecols) == 3:
+			if not has_length:
 				profiles_df["Length"] = df["Length"]
-				usecols = ["Name", "NumReads"]
+				has_length = True
 			profiles_df["metaT"] += df["NumReads"]
+
+	metaG_colsum = (profiles_df["metaG"] / profiles_df["Length"]).sum(skipna=True, numeric_only=True)
+	metaT_colsum = (profiles_df["metaT"] / profiles_df["Length"]).sum(skipna=True, numeric_only=True)
+
+	profiles_df["metaG_tpm"] = profiles_df["metaG"] / metaG_colsum * 1e6
+	profiles_df["metaT_tpm"] = profiles_df["metaT"] / metaG_colsum * 1e6
 	
 	return profiles_df
 	
