@@ -142,7 +142,7 @@ def read_metaGT_profiles(protein_coding_genes, metaG_profiles=None, metaT_profil
 				profiles_df["Length"] = df["EffectiveLength"]
 				# usecols = ["Name", "NumReads"]
 			profiles_df["metaG"] += df["NumReads"]
-			profiles_df["metaG_tpm"] += df["NumReads"] / df["EffectiveLength"]
+			profiles_df["metaG_tpm"] += df["NumReads"] / (df["EffectiveLength"] / 1000)
 
 	if metaT_profiles:
 		for f in metaT_profiles:
@@ -156,13 +156,13 @@ def read_metaGT_profiles(protein_coding_genes, metaG_profiles=None, metaT_profil
 				profiles_df["Length"] = df["EffectiveLength"]
 				# usecols = ["Name", "NumReads"]
 			profiles_df["metaT"] += df["NumReads"]
-			profiles_df["metaT_tpm"] += df["NumReads"] / df["EffectiveLength"]
+			profiles_df["metaT_tpm"] += df["NumReads"] / (df["EffectiveLength"] / 1000)
 
-	metaG_colsum = profiles_df["metaG_tpm"].sum(skipna=True, numeric_only=True)
-	metaT_colsum = profiles_df["metaT_tpm"].sum(skipna=True, numeric_only=True)
+	metaG_scaling = profiles_df["metaG_tpm"].sum(skipna=True, numeric_only=True) / 1e6
+	metaT_scaling = profiles_df["metaT_tpm"].sum(skipna=True, numeric_only=True) / 1e6
 
-	profiles_df["metaG_tpm"] = (profiles_df["metaG"] / metaG_colsum) * 1e6
-	profiles_df["metaT_tpm"] = (profiles_df["metaT"] / metaT_colsum) * 1e6
+	profiles_df["metaG_tpm"] = (profiles_df["metaG"] / metaG_scaling)
+	profiles_df["metaT_tpm"] = (profiles_df["metaT"] / metaT_scaling)
 	
 	return profiles_df
 	
