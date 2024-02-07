@@ -158,11 +158,17 @@ def read_metaGT_profiles(protein_coding_genes, metaG_profiles=None, metaT_profil
 			profiles_df["metaT"] += df["NumReads"]
 			profiles_df["metaT_tpm"] += df["NumReads"] / (df["EffectiveLength"] / 1000)
 
+	# https://www.rna-seqblog.com/rpkm-fpkm-and-tpm-clearly-explained/
+	# Divide the read counts by the length of each gene in kilobases. This gives you reads per kilobase (RPK).
+	# Count up all the RPK values in a sample and divide this number by 1,000,000. This is your “per million” scaling factor.
+	# Divide the RPK values by the “per million” scaling factor. This gives you TPM.
+
+
 	metaG_scaling = profiles_df["metaG_tpm"].sum(skipna=True, numeric_only=True) / 1e6
 	metaT_scaling = profiles_df["metaT_tpm"].sum(skipna=True, numeric_only=True) / 1e6
 
-	profiles_df["metaG_tpm"] = (profiles_df["metaG"] / metaG_scaling)
-	profiles_df["metaT_tpm"] = (profiles_df["metaT"] / metaT_scaling)
+	profiles_df["metaG_tpm"] /= metaG_scaling
+	profiles_df["metaT_tpm"] /= metaT_scaling
 	
 	return profiles_df
 	
