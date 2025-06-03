@@ -91,7 +91,7 @@ def main():
 
 	metaGT_profiles_df = read_metaGT_profiles([pid for pid, _ in proteome_d.values()], metaG_profiles=args.metaG_counts, metaT_profiles=args.metaT_counts)
 
-	metaGT_profiles_df.to_csv(f"{args.output_prefix}.salmon.tsv", sep="\t", index=False, na_rep="NA")
+	metaGT_profiles_df.to_csv(f"{args.output_prefix}.salmon.tsv", sep="\t", index=True, index_label="prodigal_protein", na_rep="NA")
 
 
 if __name__ == "__main__":
