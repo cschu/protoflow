@@ -280,7 +280,7 @@ def main():
 	]
 
 
-	evidence_both_df.to_csv(f"{args.output_prefix}.metaP_hits.tsv", sep="\t", index=False)
+	evidence_both_df.to_csv(f"{args.output_prefix}.metaP_hits.tsv", sep="\t", index=False, na_rep="NA")
 
 	with open(f"{args.output_prefix}.unknown_metaP.txt", "wt") as _out:
 		unseen = set(metaP_d).difference(evidence_both_df["metaP_protein"].to_list())
@@ -300,7 +300,7 @@ def main():
 		right_index=True,
 		how="inner",
 	).drop(["metaP_protein"], axis=1)
-	proteome_df.to_csv(f"{args.output_prefix}.no_metaP_hits.tsv", sep="\t", index=False)
+	proteome_df.to_csv(f"{args.output_prefix}.no_metaP_hits.tsv", sep="\t", index=False, na_rep="NA")
 	
 
 
