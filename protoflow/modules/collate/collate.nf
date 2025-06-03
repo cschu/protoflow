@@ -23,7 +23,7 @@ process collate_salmon {
 	"""
 	mkdir -p salmon/collated/${sample.id}
 
-	collate_salmon.py -o salmon/collated/${sample.id} ${metaG_input} ${metaT_input}
+	collate_salmon.py -o salmon/collated/${sample.id} ${proteins} ${metaG_input} ${metaT_input}
 	"""
 }
 
