@@ -1,3 +1,32 @@
+process collate_salmon {
+	input:
+	tuple val(sample), path(proteins), path(salmon_results)
+
+	output:
+	tuple val(sample), path("salmon/collated/${sample.id}/${sample.id}.salmon.tsv"), emit: collated
+
+	script:
+	metaG_files = salmon_results.findAll( { it.name.matches("(.*)metaG(.*)") } )
+	metaT_files = salmon_results.findAll( { it.name.matches("(.*)metaT(.*)") } )
+
+	def metaG_input = ""
+	if (metaG_files.size() != 0) {
+		metaG_input += "--metaG_counts "
+		metaG_input += metaG_files.join(' ')
+	}
+	def metaT_input = ""
+	if (metaT_files.size() != 0) {
+		metaT_input += "--metaT_counts "
+		metaT_input += metaT_files.join(' ')
+	}
+
+	"""
+	mkdir -p salmon/collated/${sample.id}
+
+	collate_salmon.py -o salmon/collated/${sample.id} ${metaG_input} ${metaT_input}
+	"""
+}
+
 process collate_results {
 
 	input:

@@ -8,7 +8,7 @@ include { metaT_input; metaG_input } from "./protoflow/workflows/input"
 include { salmon_index; salmon_quant } from "./protoflow/modules/profilers/salmon"
 include { miniprot; intersect_miniprot } from "./protoflow/modules/align/miniprot"
 include { makeblastdb; blastp; filter_blastp } from "./protoflow/modules/align/blast"
-include { collate_results; extract_unknown_proteins } from "./protoflow/modules/collate/collate"
+include { collate_results; extract_unknown_proteins; collate_salmon } from "./protoflow/modules/collate/collate"
 
 
 workflow {
@@ -49,7 +49,7 @@ workflow {
 		}		
 	
 	nevermore_main(
-		metaT_input.out.reads.concat(metaG_input.out.reads)
+		metaT_input.out.reads.mix(metaG_input.out.reads)
 			.map { sample, files -> return tuple(sample.clone(), files) }
 	)
 
@@ -93,6 +93,25 @@ workflow {
 
 	salmon_quant(salmon_quant_ch)
 
+	salmon_results_ch = salmon_quant.out.salmon_counts
+		.map { sample, counts ->
+			sample_id = sample.id.replaceAll(/\.meta[GT](\.singles)?$/, "")
+			sample_lib_id = sample.id.replaceAll(/\.singles$/, "")
+			return tuple(sample_id, counts)			
+		}
+		.groupTuple(by: 0, size: 4, remainder: true, sort: true)
+		.map { sample_id, counts ->
+			def meta = [:]
+			meta.id = sample_id
+			return tuple(meta, counts)
+		}
+	salmon_results_ch.dump(pretty: true, tag: "salmon_results_ch")
+
+	collate_salmon(
+		proteomes_ch.map { sample, files -> [sample.id, sample.clone(), faa] }
+			.join(salmon_results_ch.map { sample, counts -> [sample.id, counts] }, by: 0)
+			.map { sample_id, sample, faa, counts -> [sample, faa, counts] }
+		)
 
 	blastp_ch = metaP_ch
 		.map { sample_id, sample, files -> return tuple(sample_id, [files])}
@@ -137,23 +156,8 @@ workflow {
 			.map { sample_id, sample_x, miniprot_gff, sample_y, annotation_gff -> return tuple(sample_x.clone(), miniprot_gff, annotation_gff) }
 	)
 
-	salmon_results_ch = salmon_quant.out.salmon_counts
-		.map { sample, counts ->
-			sample_id = sample.id.replaceAll(/\.meta[GT](\.singles)?$/, "")
-			sample_lib_id = sample.id.replaceAll(/\.singles$/, "")
-			return tuple(sample_id, counts)			
-		}
-		.groupTuple(by: 0, size: 4, remainder: true, sort: true)
-		.map { sample_id, counts ->
-			def meta = [:]
-			meta.id = sample_id
-			return tuple(meta, counts)
-		}
-	salmon_results_ch.dump(pretty: true, tag: "salmon_results_ch")
-
 	metaP_ch_sample_only_ch = metaP_ch
 		.map { sample_id, sample, files -> return tuple(sample, [files])}
-
 
 	results_ch = metaP_ch_sample_only_ch
 		.join(proteomes_ch)
