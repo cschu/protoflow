@@ -108,7 +108,7 @@ workflow {
 	salmon_results_ch.dump(pretty: true, tag: "salmon_results_ch")
 
 	collate_salmon(
-		proteomes_ch.map { sample, files -> [sample.id, sample.clone(), faa] }
+		proteomes_ch.map { sample, faa -> [sample.id, sample.clone(), faa] }
 			.join(salmon_results_ch.map { sample, counts -> [sample.id, counts] }, by: 0)
 			.map { sample_id, sample, faa, counts -> [sample, faa, counts] }
 		)
